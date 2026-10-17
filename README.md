@@ -1,7 +1,7 @@
 <h1 align="center">Hi there, I'm Breeze 👋</h1>
 
 <p align="center">
-  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=22&pause=1000&color=58A6FF&center=true&vCenter=true&width=700&lines=Student+at+South+China+University+of+Technology" alt="Typing SVG" />
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=22&pause=1000&color=58A6FF&center=true&vCenter=true&width=480&lines=Learning+by+Building" alt="Typing SVG" />
 </p>
 
 <p align="center">
