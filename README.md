@@ -13,5 +13,5 @@
 </p>
 
 <p align="center">
-  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=Breeze1733&layout=compact&langs_count=6" alt="Top Languages" />
+  <img src="https://github-readme-stats-eight-theta.vercel.app/api/top-langs/?username=Breeze1733&layout=compact&langs_count=6" alt="Top Languages" />
 </p>
