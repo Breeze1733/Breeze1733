@@ -30,6 +30,7 @@ LANGS_COUNT = 6
 EXCLUDED_LANGUAGES = {
     "PowerShell",
     "TeX",  # LaTeX shows up as "TeX" in GitHub language stats.
+    "HTML",
 }
 
 # GitHub Linguist colors (subset covering this user's repos; anything
