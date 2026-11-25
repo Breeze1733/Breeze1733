@@ -89,28 +89,49 @@ def api_get(url):
         raise SystemExit(f"GitHub API request failed: {url} -> HTTP {e.code}")
 
 
+def fetch_repos():
+    """Repos owned by the user that the token can see.
+
+    /users/{USERNAME}/repos lists public repos, but with a fine-grained
+    PAT it does NOT return the private repos granted to the token, so
+    also query /user/repos (repos the token itself can access) and merge
+    the two lists, de-duplicated by repo id. With the default
+    GITHUB_TOKEN, /user/repos only returns this repo, which is already
+    in the public list, so the merge is a no-op there.
+    """
+    seen = {}
+    urls = [f"{API}/users/{USERNAME}/repos?type=owner"]
+    if TOKEN:
+        urls.append(f"{API}/user/repos?type=owner")
+    for url in urls:
+        page = 1
+        while True:
+            batch = api_get(f"{url}&per_page=100&page={page}")
+            if not batch:
+                break
+            for repo in batch:
+                seen[repo["id"]] = repo
+            if len(batch) < 100:
+                break
+            page += 1
+    repos = [
+        r for r in seen.values()
+        if not r.get("fork") and not r.get("archived")
+    ]
+    print(f"repos counted: {len(repos)}")
+    return repos
+
+
 def fetch_language_totals():
     totals = {}
-    page = 1
-    while True:
-        repos = api_get(
-            f"{API}/users/{USERNAME}/repos?per_page=100&page={page}&type=owner"
+    for repo in fetch_repos():
+        langs = api_get(
+            f"{API}/repos/{USERNAME}/{repo['name']}/languages"
         )
-        if not repos:
-            break
-        for repo in repos:
-            if repo.get("fork") or repo.get("archived"):
+        for lang, size in langs.items():
+            if lang in EXCLUDED_LANGUAGES:
                 continue
-            langs = api_get(
-                f"{API}/repos/{USERNAME}/{repo['name']}/languages"
-            )
-            for lang, size in langs.items():
-                if lang in EXCLUDED_LANGUAGES:
-                    continue
-                totals[lang] = totals.get(lang, 0) + size
-        if len(repos) < 100:
-            break
-        page += 1
+            totals[lang] = totals.get(lang, 0) + size
     return totals
 
 
@@ -183,7 +204,7 @@ def main():
     if not total:
         raise SystemExit(f"No language data found for user {USERNAME}")
     top = sorted(totals.items(), key=lambda kv: -kv[1])[:LANGS_COUNT]
-    for lang, size in top:
+    for lang, size in sorted(totals.items(), key=lambda kv: -kv[1]):
         print(f"{lang:20s} {size:10d}  {size / total * 100:5.2f}%")
     out_path = os.path.join(root, "assets", "top-languages.svg")
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
