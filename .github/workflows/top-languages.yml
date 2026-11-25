@@ -1,0 +1,39 @@
+# Regenerate the "Most Used Languages" card in this repo (no external service).
+#
+# Runs daily and whenever the generator or this workflow changes. The card
+# is a static SVG committed to assets/top-languages.svg, so the profile
+# README renders it straight from the repo.
+name: Top Languages
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # daily at 00:00 UTC
+  workflow_dispatch:
+  push:
+    paths:
+      - "scripts/top-languages.py"
+      - ".github/workflows/top-languages.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Generate Top Languages card
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_USERNAME: Breeze1733
+        run: python scripts/top-languages.py
+      - name: Commit updated card
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/top-languages.svg
+          git diff --cached --quiet || git commit -m "chore: update top-languages.svg"
+          git push
