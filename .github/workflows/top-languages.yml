@@ -27,7 +27,7 @@ jobs:
           python-version: "3.12"
       - name: Generate Top Languages card
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.STATS_TOKEN }}
           GITHUB_USERNAME: Breeze1733
         run: python scripts/top-languages.py
       - name: Commit updated card
